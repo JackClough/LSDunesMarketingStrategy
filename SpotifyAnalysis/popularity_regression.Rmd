@@ -1,0 +1,52 @@
+---
+title: "Spotify_Popularity_Analysis"
+author: "Jack Clough"
+date: "4/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+install.packages("dplyr")
+library(dplyr)
+```
+
+```{r}
+d <-read.csv('songs_transformed.csv')
+#genre_subset <- read.csv('genre_subset.csv')
+
+d$Top_Genre <- as.factor(d$Top_Genre)
+d$key <- as.factor(d$key)
+
+```
+
+
+```{r}
+popularity_lm <- lm(popularity ~ Top_Genre + danceability + energy +
+                  valence + tempo + duration_minutes + Lexical.Diversity
+                    + Total.Words + I(duration_minutes^2)
+                    , data = d)
+summary(popularity_lm)
+anova(popularity_lm)
+```
+
+```{r}
+popularity.res = resid(popularity_lm)
+
+plot(d$danceability, popularity.res,
+     ylab="Residuals", xlab="Popularity",
+     main="Popularity") 
+```
+
+
+```{r}
+print(cov(d$valence, d$tempo))
+```
+```{r}
+lyrics_lm <- lm(popularity ~ Top_Genre + Total.Words + 
+                  Total.Unique.Words + Avg..Word.Length +
+                  Lexical.Diversity, data = d)
+summary(lyrics_lm)
+```
+
